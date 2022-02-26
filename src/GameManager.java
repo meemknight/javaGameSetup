@@ -122,6 +122,7 @@ public abstract class GameManager
 		glfwSetErrorCallback(null).free();
 	}
 	
+	
 	public void init()
 	{
 		// Setup an error callback. The default implementation
@@ -136,6 +137,8 @@ public abstract class GameManager
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 		
 		// Create the window
 		window = glfwCreateWindow(300, 300, "geam", NULL, NULL);
@@ -219,6 +222,13 @@ public abstract class GameManager
 		// Make the window visible
 		glfwShowWindow(window);
 		
+		// This line is critical for LWJGL's interoperation with GLFW's
+		// OpenGL context, or any context that is managed externally.
+		// LWJGL detects the context that is current in the current thread,
+		// creates the GLCapabilities instance and makes the OpenGL
+		// bindings available for use.
+		GL.createCapabilities();
+		
 		gameInit();
 		
 	}
@@ -262,17 +272,23 @@ public abstract class GameManager
 		
 		glfwGetCursorPos(window, mouseX, mouseY);
 		
-		
+	}
+	
+	private int[] windowX = new int[1];
+	private int[] windowY = new int[1];
+	
+	public int getWindowW()
+	{
+		return windowX[0];
+	}
+	
+	public int getWindowH()
+	{
+		return windowY[0];
 	}
 	
 	public void loop()
 	{
-		// This line is critical for LWJGL's interoperation with GLFW's
-		// OpenGL context, or any context that is managed externally.
-		// LWJGL detects the context that is current in the current thread,
-		// creates the GLCapabilities instance and makes the OpenGL
-		// bindings available for use.
-		GL.createCapabilities();
 		
 		// Set the clear color
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -289,6 +305,8 @@ public abstract class GameManager
 			gameUpdate();
 			
 			glfwSwapBuffers(window); // swap the color buffers
+			
+			glfwGetWindowSize(window, windowX, windowY);
 			
 			updateInput();
 			glfwPollEvents();
