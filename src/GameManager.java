@@ -14,6 +14,53 @@ public abstract class GameManager
 	public long window;
 	public GameLayer gameLayer;
 	
+	private byte keysPressed[] = new byte[GLFW_KEY_LAST + 1];
+	
+	public boolean isKeyPressed(int key)
+	{
+		return (keysPressed[key] & 0b001) !=0;
+	}
+	
+	public boolean isKeyHeld(int key)
+	{
+		return (keysPressed[key] & 0b010) !=0;
+	}
+	
+	public boolean isKeyReleased(int key)
+	{
+		return (keysPressed[key] & 0b100) !=0;
+	}
+	
+	private enum KeyStates
+	{
+		EraseState,
+		Pressed,
+		Released
+	}
+	
+	//  from msb to lsb last 3 bits: released, held, pressed
+	private void changeKeyState(int index, KeyStates state)
+	{
+	
+		switch(state)
+		{
+			case EraseState:
+				keysPressed[index] = 0;
+				break;
+				
+			case Pressed:
+				keysPressed[index] = 0b11;
+				break;
+				
+			case Released:
+				keysPressed[index] = 0b110;
+				break;
+			
+		}
+	
+	}
+	
+	
 	public abstract void gameInit();
 	
 	public abstract void gameUpdate();
@@ -39,7 +86,7 @@ public abstract class GameManager
 		GLFWErrorCallback.createPrint(System.err).set();
 		
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
-		if ( !glfwInit() )
+		if(!glfwInit())
 			throw new IllegalStateException("Unable to initialize GLFW");
 		
 		// Configure GLFW
@@ -49,12 +96,22 @@ public abstract class GameManager
 		
 		// Create the window
 		window = glfwCreateWindow(300, 300, "geam", NULL, NULL);
-		if ( window == NULL )
+		if(window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 		
 		// Setup a key callback. It will be called every time a key is pressed, repeated or released.
-		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-			if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
+		glfwSetKeyCallback(window, (window, key, scancode, action, mods) ->
+		{
+			
+			if(action == GLFW_PRESS)
+			{
+				changeKeyState(key, KeyStates.Pressed);
+			}else if(action == GLFW_RELEASE)
+			{
+				changeKeyState(key, KeyStates.Released);
+			}
+
+			if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
 				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
 		});
 		
@@ -87,7 +144,29 @@ public abstract class GameManager
 		glfwShowWindow(window);
 		
 		gameInit();
+		
+	}
 	
+	private void updateInput()
+	{
+		for(int i =0; i < keysPressed.length; i++)
+		{
+			switch(keysPressed[i])
+			{
+				case 0b000:
+					break;	//do nothing
+				case 0b010:
+					break;	//key is being held, do nothing
+				case 0b011:	//pressed
+					keysPressed[i] = 0b010; //go to held
+					break;
+				case 0b110:	//released
+					keysPressed[i] = 0b000; //go to nothing
+					break;
+				
+			}
+		}
+		
 	}
 	
 	public void loop()
@@ -104,15 +183,14 @@ public abstract class GameManager
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
-		while ( !glfwWindowShouldClose(window) )
+		while(!glfwWindowShouldClose(window))
 		{
 			
 			gameUpdate();
 			
 			glfwSwapBuffers(window); // swap the color buffers
 			
-			// Poll for window events. The key callback above will only be
-			// invoked during this call.
+			updateInput();
 			glfwPollEvents();
 		}
 	}
@@ -121,9 +199,8 @@ public abstract class GameManager
 	{
 		
 		gameClose();
-	
+		
 	}
-	
 	
 	
 }

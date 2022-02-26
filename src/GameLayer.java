@@ -1,8 +1,10 @@
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glEnd;
 
 public class GameLayer extends  GameManager
 {
+	float pos = 0;
 	
 	public void gameInit()
 	{
@@ -25,6 +27,13 @@ public class GameLayer extends  GameManager
 		glVertex2f(1.f, -1.f);
 		
 		glEnd();
+		
+		if(isKeyReleased(GLFW_KEY_RIGHT))
+		{
+			pos += 0.1f;
+		}
+		
+		System.out.println(pos);
 	}
 	
 	public void gameClose()
