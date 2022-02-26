@@ -19,8 +19,6 @@ public class Main
 		gm.close();
 		//gm.freeResources(); //not necessary for this app
 		
-		
-		
 	}
 	
 }

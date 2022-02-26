@@ -14,21 +14,58 @@ public abstract class GameManager
 	public long window;
 	public GameLayer gameLayer;
 	
-	private byte keysPressed[] = new byte[GLFW_KEY_LAST + 1];
+	//last 2 positions are for mouse
+	private byte keysPressed[] = new byte[GLFW_KEY_LAST + 3];
+	private boolean focus = true;
+	
+	public boolean isFocused()
+	{
+		return focus;
+	}
 	
 	public boolean isKeyPressed(int key)
 	{
-		return (keysPressed[key] & 0b001) !=0;
+		return (keysPressed[key] & 0b001) != 0;
 	}
 	
 	public boolean isKeyHeld(int key)
 	{
-		return (keysPressed[key] & 0b010) !=0;
+		return (keysPressed[key] & 0b010) != 0;
 	}
 	
 	public boolean isKeyReleased(int key)
 	{
-		return (keysPressed[key] & 0b100) !=0;
+		return (keysPressed[key] & 0b100) != 0;
+	}
+	
+	public boolean isLeftMouseButtonPressed()
+	{
+		return isKeyPressed(keysPressed.length - 2);
+	}
+	
+	public boolean isLeftMouseButtonHeld()
+	{
+		return isKeyHeld(keysPressed.length - 2);
+	}
+	
+	public boolean isLeftMouseButtonReleased()
+	{
+		return isKeyReleased(keysPressed.length - 2);
+	}
+	
+	public boolean isRightMouseButtonPressed()
+	{
+		return isKeyPressed(keysPressed.length - 1);
+	}
+	
+	public boolean isRightMouseButtonHeld()
+	{
+		return isKeyHeld(keysPressed.length - 1);
+	}
+	
+	public boolean isRightMouseButtonReleased()
+	{
+		return isKeyReleased(keysPressed.length - 1);
 	}
 	
 	private enum KeyStates
@@ -41,23 +78,29 @@ public abstract class GameManager
 	//  from msb to lsb last 3 bits: released, held, pressed
 	private void changeKeyState(int index, KeyStates state)
 	{
-	
 		switch(state)
 		{
 			case EraseState:
 				keysPressed[index] = 0;
 				break;
-				
+			
 			case Pressed:
 				keysPressed[index] = 0b11;
 				break;
-				
+			
 			case Released:
 				keysPressed[index] = 0b110;
 				break;
-			
 		}
+	}
 	
+	
+	private void changeAllKeyState(KeyStates state)
+	{
+		for(int i = 0; i < keysPressed.length; i++)
+		{
+			changeKeyState(i, state);
+		}
 	}
 	
 	
@@ -106,14 +149,46 @@ public abstract class GameManager
 			if(action == GLFW_PRESS)
 			{
 				changeKeyState(key, KeyStates.Pressed);
-			}else if(action == GLFW_RELEASE)
+			}
+			else if(action == GLFW_RELEASE)
 			{
 				changeKeyState(key, KeyStates.Released);
 			}
-
-			if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+			
 		});
+		
+		glfwSetWindowFocusCallback(window, (window, f) ->
+		{
+			focus = f;
+		});
+		
+		glfwSetMouseButtonCallback(window, (window, key, action, mods) ->
+		{
+			int k = 0;
+			
+			if(key == GLFW_MOUSE_BUTTON_LEFT)
+			{
+				k = keysPressed.length - 2;
+			}
+			else if(key == GLFW_MOUSE_BUTTON_RIGHT)
+			{
+				k = keysPressed.length - 1;
+			}
+			
+			if(k != 0)
+			{
+				if(action == GLFW_PRESS)
+				{
+					changeKeyState(k, KeyStates.Pressed);
+				}
+				else if(action == GLFW_RELEASE)
+				{
+					changeKeyState(k, KeyStates.Released);
+				}
+			}
+			
+		});
+		
 		
 		// Get the thread stack and push a new frame
 		//try ( MemoryStack stack = stackPush() )
@@ -137,8 +212,9 @@ public abstract class GameManager
 		
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
+		
 		// Enable v-sync
-		glfwSwapInterval(1);
+		//glfwSwapInterval(1);
 		
 		// Make the window visible
 		glfwShowWindow(window);
@@ -147,25 +223,45 @@ public abstract class GameManager
 		
 	}
 	
+	private double[] mouseX = new double[1];
+	private double[] mouseY = new double[1];
+	
+	public int getMousePosX()
+	{
+		return (int) mouseX[0];
+	}
+	
+	public int getMousePosY()
+	{
+		return (int) mouseY[0];
+	}
+	
+	public void setMousePosition(int x, int y)
+	{
+		glfwSetCursorPos(window, x, y);
+	}
+	
 	private void updateInput()
 	{
-		for(int i =0; i < keysPressed.length; i++)
+		for(int i = 0; i < keysPressed.length; i++)
 		{
 			switch(keysPressed[i])
 			{
 				case 0b000:
-					break;	//do nothing
+					break;    //do nothing
 				case 0b010:
-					break;	//key is being held, do nothing
-				case 0b011:	//pressed
+					break;    //key is being held, do nothing
+				case 0b011:    //pressed
 					keysPressed[i] = 0b010; //go to held
 					break;
-				case 0b110:	//released
+				case 0b110:    //released
 					keysPressed[i] = 0b000; //go to nothing
 					break;
-				
 			}
 		}
+		
+		glfwGetCursorPos(window, mouseX, mouseY);
+		
 		
 	}
 	
@@ -185,6 +281,10 @@ public abstract class GameManager
 		// the window or has pressed the ESCAPE key.
 		while(!glfwWindowShouldClose(window))
 		{
+			if(!focus)
+			{
+				changeAllKeyState(KeyStates.EraseState);
+			}
 			
 			gameUpdate();
 			
