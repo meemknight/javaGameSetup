@@ -287,7 +287,8 @@ public abstract class GameManager
 			
 		}
 				, 0);
-		GL43.glDebugMessageControl(GL43.GL_DONT_CARE, GL43.GL_DONT_CARE, GL43.GL_DONT_CARE, 0, true);
+		
+		//GL43.glDebugMessageControl(GL43.GL_DONT_CARE, GL43.GL_DONT_CARE, GL43.GL_DONT_CARE, 0, true);
 		
 		
 		gameInit();

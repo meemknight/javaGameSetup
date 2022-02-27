@@ -11,6 +11,7 @@ public class GameLayer extends GameManager
 	float pos = 0;
 	int vertexBuffer = 0;
 	Shader shader = new Shader();
+	int vao;
 	
 	public void gameInit()
 	{
@@ -25,6 +26,9 @@ public class GameLayer extends GameManager
 		
 		shader.bind();
 		
+		vao = GL30.glGenVertexArrays();
+		GL30.glBindVertexArray(vao);
+		
 		float bufferData[] = {0.f, 1.f, -1.f, -1.f, 1.f, -1.f};
 		
 		vertexBuffer = GL30.glGenBuffers();
@@ -34,6 +38,8 @@ public class GameLayer extends GameManager
 		GL30.glEnableVertexAttribArray(0);
 		GL30.glVertexAttribPointer(0, 2, GL13.GL_FLOAT, false, 0, 0);
 		//GL30.glVertexAttrib3f(1, 1,1,1);
+		
+		GL30.glBindVertexArray(0);
 		
 	}
 	
@@ -59,13 +65,14 @@ public class GameLayer extends GameManager
 		glEnd();
 		 */
 		
-		GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vertexBuffer);
-		GL30.glEnableVertexAttribArray(0);
-		GL30.glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
-
+		GL30.glBindVertexArray(vao);
+		
 		shader.bind();
 		
 		GL30.glDrawArrays(GL30.GL_TRIANGLES, 0, 3);
+		
+		GL30.glBindVertexArray(0);
+		
 		
 		if(isLeftMouseButtonReleased())
 			System.out.println(getMousePosX() + " " + getMousePosY());

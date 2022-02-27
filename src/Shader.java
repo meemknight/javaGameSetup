@@ -56,11 +56,11 @@ public class Shader
 		
 		GL30.glLinkProgram(id);
 		
-		if(GL30.glGetShaderi(id, GL30.GL_LINK_STATUS) == 0)
+		if(GL30.glGetProgrami(id, GL30.GL_LINK_STATUS) == 0)
 		{
 			int messageSize[] = new int[1];
-			messageSize[0] = GL30.glGetShaderi(id, GL30.GL_INFO_LOG_LENGTH);
-			System.out.println(GL30.glGetShaderInfoLog(id, messageSize[0]));
+			messageSize[0] = GL30.glGetProgrami(id, GL30.GL_INFO_LOG_LENGTH);
+			System.out.println(GL30.glGetProgramInfoLog(id, messageSize[0]));
 			GL30.glDeleteProgram(id);
 			GL30.glDeleteShader(vs);
 			GL30.glDeleteShader(fs);
