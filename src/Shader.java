@@ -12,6 +12,11 @@ public class Shader
 	
 	int id = 0;
 	
+	public void bind()
+	{
+		GL30.glUseProgram(id);
+	}
+	
 	String readEntireFile(String file) throws IOException
 	{
 		return new String(Files.readAllBytes(Paths.get(file)));
@@ -21,17 +26,13 @@ public class Shader
 	{
 		int id = GL30.glCreateShader(type);
 		GL30.glShaderSource(id, text);
+		GL30.glCompileShader(id);
 		
 		if(GL30.glGetShaderi(id, GL30.GL_COMPILE_STATUS) == 0)
 		{
 			int messageSize[] = new int[1];
 			messageSize[0] = GL30.glGetShaderi(id, GL30.GL_INFO_LOG_LENGTH);
-			
-			ByteBuffer buffer = ByteBuffer.allocate(messageSize[0]);
-			
-			GL30.glGetShaderInfoLog(id, messageSize, buffer);
-			
-			System.out.println("error: " + StandardCharsets.UTF_8.decode(buffer).toString());
+			System.out.println(GL30.glGetShaderInfoLog(id, messageSize[0]));
 			return 0;
 		}
 		
@@ -46,8 +47,31 @@ public class Shader
 	public void loadShaderFromMemory(String vertexShader, String fragmentShader)
 	{
 		int vs = loadShaderComponent(GL30.GL_VERTEX_SHADER, vertexShader);
-		int fs = loadShaderComponent(GL30.GL_FRAGMENT_SHADER, vertexShader);
+		int fs = loadShaderComponent(GL30.GL_FRAGMENT_SHADER, fragmentShader);
 		
+		id = GL30.glCreateProgram();
+		
+		GL30.glAttachShader(id, vs);
+		GL30.glAttachShader(id, fs);
+		
+		GL30.glLinkProgram(id);
+		
+		if(GL30.glGetShaderi(id, GL30.GL_LINK_STATUS) == 0)
+		{
+			int messageSize[] = new int[1];
+			messageSize[0] = GL30.glGetShaderi(id, GL30.GL_INFO_LOG_LENGTH);
+			System.out.println(GL30.glGetShaderInfoLog(id, messageSize[0]));
+			GL30.glDeleteProgram(id);
+			GL30.glDeleteShader(vs);
+			GL30.glDeleteShader(fs);
+			id = 0;
+			return;
+		}
+		
+		GL30.glValidateProgram(id);
+		
+		GL30.glDeleteShader(vs);
+		GL30.glDeleteShader(fs);
 		
 	}
 	

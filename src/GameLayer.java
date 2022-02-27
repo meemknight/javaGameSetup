@@ -10,11 +10,10 @@ public class GameLayer extends GameManager
 {
 	float pos = 0;
 	int vertexBuffer = 0;
+	Shader shader = new Shader();
 	
 	public void gameInit()
 	{
-		
-		Shader shader = new Shader();
 		
 		try
 		{
@@ -24,16 +23,17 @@ public class GameLayer extends GameManager
 			System.out.println("shader error" + e);
 		}
 		
+		shader.bind();
 		
-		float bufferData[] = {0, 1, -1, -1, 1, -1};
+		float bufferData[] = {0.f, 1.f, -1.f, -1.f, 1.f, -1.f};
 		
 		vertexBuffer = GL30.glGenBuffers();
-		GL30.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffer);
-		GL30.glBufferData(GL15.GL_ARRAY_BUFFER, bufferData, GL15.GL_STATIC_DRAW);
+		GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vertexBuffer);
+		GL30.glBufferData(GL30.GL_ARRAY_BUFFER, bufferData, GL30.GL_STATIC_DRAW);
 		
 		GL30.glEnableVertexAttribArray(0);
-		GL30.glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
-		GL30.glVertexAttrib3f(1, 1,1,1);
+		GL30.glVertexAttribPointer(0, 2, GL13.GL_FLOAT, false, 0, 0);
+		//GL30.glVertexAttrib3f(1, 1,1,1);
 		
 	}
 	
@@ -59,7 +59,13 @@ public class GameLayer extends GameManager
 		glEnd();
 		 */
 		
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vertexBuffer);
+		GL30.glEnableVertexAttribArray(0);
+		GL30.glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+
+		shader.bind();
+		
+		GL30.glDrawArrays(GL30.GL_TRIANGLES, 0, 3);
 		
 		if(isLeftMouseButtonReleased())
 			System.out.println(getMousePosX() + " " + getMousePosY());
