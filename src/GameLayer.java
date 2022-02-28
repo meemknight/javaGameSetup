@@ -2,15 +2,22 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glEnd;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.opengl.*;
+import org.lwjgl.system.MemoryStack;
 
 import java.io.IOException;
+import java.nio.FloatBuffer;
 
 public class GameLayer extends GameManager
 {
 	float pos = 0;
 	int vertexBuffer = 0;
 	Shader shader = new Shader();
+	Camera camera = new Camera();
+	int u_viewProjection;
 	int vao;
 	
 	public void gameInit()
@@ -19,6 +26,7 @@ public class GameLayer extends GameManager
 		try
 		{
 			shader.loadShaderFromFile("resources//vert.vert", "resources//frag.frag");
+			u_viewProjection = GL30.glGetUniformLocation(shader.id, "u_viewProjection");
 		}
 		catch(Exception e){
 			System.out.println("shader error" + e);
@@ -43,6 +51,8 @@ public class GameLayer extends GameManager
 		
 	}
 	
+	float rotation = 0.f;
+	
 	public void gameUpdate()
 	{
 		int w = getWindowW();
@@ -51,31 +61,28 @@ public class GameLayer extends GameManager
 		glViewport(0, 0, w, h);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 		
-		/*
-		glBegin(GL_TRIANGLES);
-		glColor3f(1.f, 0.f, 0.f);
-		glVertex2f(0.f, 1.f);
-		
-		glColor3f(0.f, 1.f, 0.f);
-		glVertex2f(-1.f, -1.f);
-		
-		glColor3f(0.f, 0.f, 1.f);
-		glVertex2f(1.f, -1.f);
-		
-		glEnd();
-		 */
-		
+	
 		GL30.glBindVertexArray(vao);
 		
+		
+		
 		shader.bind();
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			
+			FloatBuffer fb = camera.getViewProjectionMatrix().get(stack.mallocFloat(16));
+			//Vector3f rotate = new Vector3f(0.0f, 0.0f, 1.0f);
+			//FloatBuffer fb = new Matrix4f().rotate(rotation * (float)Math.PI, rotate).get(stack.mallocFloat(16));
+			
+			rotation += getDeltaTime();
+			
+			GL30.glUniformMatrix4fv(u_viewProjection, false,
+					fb);
+		}
 		
 		GL30.glDrawArrays(GL30.GL_TRIANGLES, 0, 3);
 		
 		GL30.glBindVertexArray(0);
 		
-		
-		if(isLeftMouseButtonReleased())
-			System.out.println(getMousePosX() + " " + getMousePosY());
 		
 	}
 	

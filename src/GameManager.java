@@ -2,6 +2,8 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+import java.util.Date;
+
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -349,14 +351,20 @@ public abstract class GameManager
 		return windowY[0];
 	}
 	
+	private float deltaTime = 0;
+	public float getDeltaTime()
+	{
+		return deltaTime;
+	};
+	
 	public void loop()
 	{
 		
-		// Set the clear color
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		
-		// Run the rendering loop until the user has attempted to close
-		// the window or has pressed the ESCAPE key.
+		Date date = new Date();
+		long timeA = System.nanoTime();
+		
 		while(!glfwWindowShouldClose(window))
 		{
 			if(!focus)
@@ -365,6 +373,13 @@ public abstract class GameManager
 			}
 			
 			gameUpdate();
+			
+			long timeB = System.nanoTime();
+			//calculate deltaTime, seconds
+			deltaTime = (timeB - timeA) / 1_000_000_000.f;
+			
+			timeA = System.nanoTime();
+			
 			
 			glfwSwapBuffers(window); // swap the color buffers
 			
