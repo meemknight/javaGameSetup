@@ -70,7 +70,7 @@ public class GameLayer extends GameManager
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			
 			FloatBuffer fb = camera.getViewProjectionMatrix().get(stack.mallocFloat(16));
-			//Vector3f rotate = new Vector3f(0.0f, 0.0f, 1.0f);
+			//Vector3f rotate = new Vector3f(0.0f, 0.0f, 1.f);
 			//FloatBuffer fb = new Matrix4f().rotate(rotation * (float)Math.PI, rotate).get(stack.mallocFloat(16));
 			
 			rotation += getDeltaTime();
