@@ -6,5 +6,5 @@ uniform mat4 u_viewProjection;
 
 void main()
 {
-    gl_Position = vec4(pos, 0.5, 1) * u_viewProjection;
+    gl_Position = u_viewProjection * vec4(pos, 0.5, 1);
 }

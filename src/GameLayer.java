@@ -3,6 +3,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glEnd;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.*;
@@ -53,6 +54,9 @@ public class GameLayer extends GameManager
 	
 	float rotation = 0.f;
 	
+	float lastMouseX = getMousePosX();
+	float lastMouseY = getMousePosY();
+	
 	public void gameUpdate()
 	{
 		int w = getWindowW();
@@ -61,9 +65,57 @@ public class GameLayer extends GameManager
 		glViewport(0, 0, w, h);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 		
-	
-		GL30.glBindVertexArray(vao);
+		//input
+		{
+			Vector3f move = new Vector3f(0,0,0);
+			float speed = 10 * getDeltaTime();
+			
+			if(isKeyHeld(GLFW_KEY_W))
+			{
+				move.z -= speed;
+			}
+			if(isKeyHeld(GLFW_KEY_S))
+			{
+				move.z += speed;
+			}
+			
+			if(isKeyHeld(GLFW_KEY_A))
+			{
+				move.x -= speed;
+			}
+			if(isKeyHeld(GLFW_KEY_D))
+			{
+				move.x += speed;
+			}
+			
+			if(isKeyHeld(GLFW_KEY_Q))
+			{
+				move.y -= speed;
+			}
+			if(isKeyHeld(GLFW_KEY_E))
+			{
+				move.y += speed;
+			}
+			
+			if(isRightMouseButtonHeld())
+			{
+				Vector2f delta = new Vector2f(getMousePosX(), getMousePosY());
+				delta.x -= lastMouseX;
+				delta.y -= lastMouseY;
+				delta.mul(getDeltaTime());
+				camera.rotateCamera(delta);
+			}
+
+			lastMouseX = getMousePosX();
+			lastMouseY = getMousePosY();
+			
+			camera.moveFPS(move);
+			
+		}
 		
+		camera.updateAspectRation(w, h);
+		
+		GL30.glBindVertexArray(vao);
 		
 		
 		shader.bind();

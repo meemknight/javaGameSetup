@@ -74,9 +74,7 @@ public abstract class GameManager
 	
 	private enum KeyStates
 	{
-		EraseState,
-		Pressed,
-		Released
+		EraseState, Pressed, Released
 	}
 	
 	//  from msb to lsb last 3 bits: released, held, pressed
@@ -126,7 +124,6 @@ public abstract class GameManager
 		glfwSetErrorCallback(null).free();
 	}
 	
-
 	
 	public void init()
 	{
@@ -237,58 +234,89 @@ public abstract class GameManager
 		//https://www.google.com/search?client=opera-gx&q=intelij+select+multiple+lines&sourceid=opera&ie=UTF-8&oe=UTF-8
 		GL43.glEnable(GL43.GL_DEBUG_OUTPUT);
 		GL43.glEnable(GL43.GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		GL43.glDebugMessageCallback(
-				(source,
-				type,
-				id,
-				severity,
-				length,
-				message,
-				userParam) ->
+		GL43.glDebugMessageCallback((source, type, id, severity, length, message, userParam) ->
 		{
 			// ignore non-significant error/warning codes
-			if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
+			if(id == 131169 || id == 131185 || id == 131218 || id == 131204)
+				return;
 			
 			System.out.println("---------------");
-			System.out.print("Debug message (" + id + "): " );
+			System.out.print("Debug message (" + id + "): ");
 			System.out.println(memUTF8(message).toString());
 			
-			switch (source)
+			switch(source)
 			{
-				case GL_DEBUG_SOURCE_API:             System.out.print("Source: API"); break;
-				case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   System.out.print("Source: Window System"); break;
-				case GL_DEBUG_SOURCE_SHADER_COMPILER: System.out.print("Source: Shader Compiler"); break;
-				case GL_DEBUG_SOURCE_THIRD_PARTY:     System.out.print("Source: Third Party"); break;
-				case GL_DEBUG_SOURCE_APPLICATION:     System.out.print("Source: Application"); break;
-				case GL_DEBUG_SOURCE_OTHER:           System.out.print("Source: Other"); break;
+				case GL_DEBUG_SOURCE_API:
+					System.out.print("Source: API");
+					break;
+				case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+					System.out.print("Source: Window System");
+					break;
+				case GL_DEBUG_SOURCE_SHADER_COMPILER:
+					System.out.print("Source: Shader Compiler");
+					break;
+				case GL_DEBUG_SOURCE_THIRD_PARTY:
+					System.out.print("Source: Third Party");
+					break;
+				case GL_DEBUG_SOURCE_APPLICATION:
+					System.out.print("Source: Application");
+					break;
+				case GL_DEBUG_SOURCE_OTHER:
+					System.out.print("Source: Other");
+					break;
 			}
 			System.out.println();
 			
-			switch (type)
+			switch(type)
 			{
-				case GL_DEBUG_TYPE_ERROR:               System.out.print("Type: Error"); break;
-				case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: System.out.print("Type: Deprecated Behaviour"); break;
-				case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  System.out.print("Type: Undefined Behaviour"); break;
-				case GL_DEBUG_TYPE_PORTABILITY:         System.out.print("Type: Portability"); break;
-				case GL_DEBUG_TYPE_PERFORMANCE:         System.out.print("Type: Performance"); break;
-				case GL_DEBUG_TYPE_MARKER:              System.out.print("Type: Marker"); break;
-				case GL_DEBUG_TYPE_PUSH_GROUP:          System.out.print("Type: Push Group"); break;
-				case GL_DEBUG_TYPE_POP_GROUP:           System.out.print("Type: Pop Group"); break;
-				case GL_DEBUG_TYPE_OTHER:               System.out.print("Type: Other"); break;
+				case GL_DEBUG_TYPE_ERROR:
+					System.out.print("Type: Error");
+					break;
+				case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+					System.out.print("Type: Deprecated Behaviour");
+					break;
+				case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+					System.out.print("Type: Undefined Behaviour");
+					break;
+				case GL_DEBUG_TYPE_PORTABILITY:
+					System.out.print("Type: Portability");
+					break;
+				case GL_DEBUG_TYPE_PERFORMANCE:
+					System.out.print("Type: Performance");
+					break;
+				case GL_DEBUG_TYPE_MARKER:
+					System.out.print("Type: Marker");
+					break;
+				case GL_DEBUG_TYPE_PUSH_GROUP:
+					System.out.print("Type: Push Group");
+					break;
+				case GL_DEBUG_TYPE_POP_GROUP:
+					System.out.print("Type: Pop Group");
+					break;
+				case GL_DEBUG_TYPE_OTHER:
+					System.out.print("Type: Other");
+					break;
 			}
 			System.out.println();
 			
-			switch (severity)
+			switch(severity)
 			{
-				case GL_DEBUG_SEVERITY_HIGH:         System.out.print("Severity: high"); break;
-				case GL_DEBUG_SEVERITY_MEDIUM:       System.out.print("Severity: medium"); break;
-				case GL_DEBUG_SEVERITY_LOW:          System.out.print("Severity: low"); break;
-				case GL_DEBUG_SEVERITY_NOTIFICATION: System.out.print("Severity: notification"); break;
+				case GL_DEBUG_SEVERITY_HIGH:
+					System.out.print("Severity: high");
+					break;
+				case GL_DEBUG_SEVERITY_MEDIUM:
+					System.out.print("Severity: medium");
+					break;
+				case GL_DEBUG_SEVERITY_LOW:
+					System.out.print("Severity: low");
+					break;
+				case GL_DEBUG_SEVERITY_NOTIFICATION:
+					System.out.print("Severity: notification");
+					break;
 			}
 			System.out.println("\n");
 			
-		}
-				, 0);
+		}, 0);
 		
 		//GL43.glDebugMessageControl(GL43.GL_DONT_CARE, GL43.GL_DONT_CARE, GL43.GL_DONT_CARE, 0, true);
 		
@@ -352,10 +380,13 @@ public abstract class GameManager
 	}
 	
 	private float deltaTime = 0;
+	
 	public float getDeltaTime()
 	{
 		return deltaTime;
-	};
+	}
+	
+	;
 	
 	public void loop()
 	{
@@ -377,6 +408,7 @@ public abstract class GameManager
 			long timeB = System.nanoTime();
 			//calculate deltaTime, seconds
 			deltaTime = (timeB - timeA) / 1_000_000_000.f;
+			deltaTime = Math.min(deltaTime, 1.f / 15.f);
 			
 			timeA = System.nanoTime();
 			
