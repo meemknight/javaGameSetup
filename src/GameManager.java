@@ -320,6 +320,8 @@ public abstract class GameManager
 		
 		//GL43.glDebugMessageControl(GL43.GL_DONT_CARE, GL43.GL_DONT_CARE, GL43.GL_DONT_CARE, 0, true);
 		
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glEnable(GL_DEPTH_TEST);
 		
 		gameInit();
 		
@@ -390,8 +392,6 @@ public abstract class GameManager
 	
 	public void loop()
 	{
-		
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		
 		Date date = new Date();
 		long timeA = System.nanoTime();
