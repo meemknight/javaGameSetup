@@ -21,6 +21,7 @@ public class GameLayer extends GameManager
 	Camera camera = new Camera();
 	int u_viewProjection;
 	int vao;
+	Texture t = new Texture();
 	
 	public void gameInit()
 	{
@@ -29,6 +30,7 @@ public class GameLayer extends GameManager
 		{
 			shader.loadShaderFromFile("resources//vert.vert", "resources//frag.frag");
 			u_viewProjection = GL30.glGetUniformLocation(shader.id, "u_viewProjection");
+			t.load("resources//dog.png");
 		}
 		catch(Exception e){
 			System.out.println("shader error" + e);
@@ -244,6 +246,9 @@ public class GameLayer extends GameManager
 			GL30.glUniformMatrix4fv(u_viewProjection, false,
 					fb);
 		}
+		
+		GL30.glActiveTexture(GL30.GL_TEXTURE0);
+		GL30.glBindTexture(GL_TEXTURE_2D, t.id);
 		
 		GL30.glDrawElements(GL30.GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		
