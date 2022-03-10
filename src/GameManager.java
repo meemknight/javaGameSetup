@@ -1,3 +1,9 @@
+/////////////////////////////////////////////
+//https://github.com/meemknight/javaGameSetup
+//(c) Luta Vlad
+//do not remove this notice
+/////////////////////////////////////////////
+
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -111,7 +117,7 @@ public abstract class GameManager
 	public abstract void gameUpdate();
 	
 	public abstract void gameClose();
-	
+
 	
 	public void freeResources()
 	{
